@@ -1,0 +1,22 @@
+0 R8,U5,L5,D3 
+pos:0 elem:R8 dir:R l:8 err:<nil>
+pos:1 elem:U5 dir:U l:5 err:<nil>
+pos:2 elem:L5 dir:L l:5 err:<nil>
+pos:3 elem:D3 dir:D l:3 err:<nil>
+1 U7,R6,D4,L4 
+pos:0 elem:U7 dir:U l:7 err:<nil>
+pos:1 elem:R6 dir:R l:6 err:<nil>
+pos:2 elem:D4 dir:D l:4 err:<nil>
+pos:3 elem:L4 dir:L l:4 err:<nil>
+w:1 p:3 
+px:-2 py:3 ix:1 iy:0 
+X:0 x:-8 Y:7 y:0 
+,,,,,,,  
+,     ,  
+,  ^^^:^^
+,  ^  , ^
+, ,:,,, ^
+,  ^    ^
+,       ^
+0^^^^^^^^
+map[{X:-8 Y:0 Wire:0}:true {X:-8 Y:1 Wire:0}:true {X:-8 Y:2 Wire:0}:true {X:-8 Y:3 Wire:0}:true {X:-8 Y:4 Wire:0}:true {X:-8 Y:5 Wire:0}:true {X:-7 Y:0 Wire:0}:true {X:-7 Y:5 Wire:0}:true {X:-6 Y:0 Wire:0}:true {X:-6 Y:3 Wire:1}:true {X:-6 Y:4 Wire:1}:true {X:-6 Y:5 Wire:0}:true {X:-6 Y:5 Wire:1}:true {X:-6 Y:6 Wire:1}:true {X:-6 Y:7 Wire:1}:true {X:-5 Y:0 Wire:0}:true {X:-5 Y:3 Wire:1}:true {X:-5 Y:5 Wire:0}:true {X:-5 Y:7 Wire:1}:true {X:-4 Y:0 Wire:0}:true {X:-4 Y:3 Wire:1}:true {X:-4 Y:5 Wire:0}:true {X:-4 Y:7 Wire:1}:true {X:-3 Y:0 Wire:0}:true {X:-3 Y:2 Wire:0}:true {X:-3 Y:3 Wire:0}:true {X:-3 Y:3 Wire:1}:true {X:-3 Y:4 Wire:0}:true {X:-3 Y:5 Wire:0}:true {X:-3 Y:7 Wire:1}:true {X:-2 Y:0 Wire:0}:true {X:-2 Y:3 Wire:1}:true {X:-2 Y:7 Wire:1}:true {X:-1 Y:0 Wire:0}:true {X:-1 Y:7 Wire:1}:true {X:0 Y:0 Wire:0}:false {X:0 Y:1 Wire:1}:true {X:0 Y:2 Wire:1}:true {X:0 Y:3 Wire:1}:true {X:0 Y:4 Wire:1}:true {X:0 Y:5 Wire:1}:true {X:0 Y:6 Wire:1}:true {X:0 Y:7 Wire:1}:true]
