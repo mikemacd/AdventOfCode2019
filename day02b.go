@@ -26,14 +26,14 @@ func main() {
 
 	// Process the input
 	var input []int
- 	for i, line := range bytes.Split(data, []byte(",")) {
+	for i, line := range bytes.Split(data, []byte(",")) {
 		number := strings.TrimSpace(string(line))
 		if number != "" {
 			n, err := strconv.Atoi(string(number))
 			if err != nil {
 				fmt.Printf("Could not convert line %d (%s) to int\n", i, number)
 			}
-			input = append(input,n)
+			input = append(input, n)
 		}
 	}
 	if debug {
@@ -55,35 +55,34 @@ func main() {
 
 				code := make([]int, len(input))
 				copy(code, input)
-  				code[1] = noun
+				code[1] = noun
 				code[2] = verb
-
 
 				for i := 0; i < len(code); i += 4 {
 					opcode := code[i]
 					if opcode == 99 {
 						if debug {
 							fmt.Printf("EXIT\n")
-							fmt.Printf("noun:%d verb:%d i:%d\topcode:%d\toperand1:%d\toperand2:%d\tdest:%d\n",  noun,verb, i, opcode, -1, -1, code[i+3])
+							fmt.Printf("noun:%d verb:%d i:%d\topcode:%d\toperand1:%d\toperand2:%d\tdest:%d\n", noun, verb, i, opcode, -1, -1, code[i+3])
 						}
 						break
 					}
 					operand1 := code[code[i+1]]
 					operand2 := code[code[i+2]]
 					if debug {
-						fmt.Printf("noun:%d verb:%d i:%d\topcode:%d\toperand1:%d\toperand2:%d\tdest:%d\n", noun,verb,  i, opcode, operand1, operand2, code[i+3])
+						fmt.Printf("noun:%d verb:%d i:%d\topcode:%d\toperand1:%d\toperand2:%d\tdest:%d\n", noun, verb, i, opcode, operand1, operand2, code[i+3])
 					}
 					switch opcode {
 					case 1:
 						if debug {
-							fmt.Printf("noun:%d verb:%d %d = %d + %d = %d\n", noun,verb,  code[i+3], operand1, operand2, operand1+operand2)
+							fmt.Printf("noun:%d verb:%d %d = %d + %d = %d\n", noun, verb, code[i+3], operand1, operand2, operand1+operand2)
 						}
 
 						code[code[i+3]] = operand1 + operand2
 
 					case 2:
 						if debug {
-							fmt.Printf("noun:%d verb:%d %d = %d * %d = %d\n", noun,verb,  code[i+3], operand1, operand2, operand1-operand2)
+							fmt.Printf("noun:%d verb:%d %d = %d * %d = %d\n", noun, verb, code[i+3], operand1, operand2, operand1-operand2)
 						}
 
 						code[code[i+3]] = operand1 * operand2

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"strings"
 	"bytes"
-	"io/ioutil"
 	"fmt"
- 	"os"
+	"io/ioutil"
+	"os"
 	"strconv"
- )
+	"strings"
+)
 
 func main() {
 	if len(os.Args) < 2 {
@@ -15,7 +15,6 @@ func main() {
 		return
 	}
 
-	
 	data, err := ioutil.ReadFile(os.Args[1])
 	if err != nil {
 		fmt.Println("Can't read file:", os.Args[1])
@@ -37,11 +36,10 @@ func main() {
 
 }
 
-func fuelForFuel(f int) (int) {
-	f4f := (f/3)-2
-	if f4f >0 {
-		return f4f+fuelForFuel(f4f)
+func fuelForFuel(f int) int {
+	f4f := (f / 3) - 2
+	if f4f > 0 {
+		return f4f + fuelForFuel(f4f)
 	}
 	return 0
 }
- 
