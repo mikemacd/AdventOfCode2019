@@ -10,6 +10,8 @@ import (
 )
 
 func main() {
+	var sum int
+
 	if len(os.Args) < 2 {
 		fmt.Println("Missing parameter, provide file name!")
 		return
@@ -20,7 +22,7 @@ func main() {
 		panic(err)
 	}
 
-	sum := 0
+	sum = 0
 	for i, line := range bytes.Split(data, []byte("\n")) {
 		number := strings.TrimSpace(string(line))
 		if number != "" {
@@ -31,6 +33,7 @@ func main() {
 			sum += (n / 3) - 2
 		}
 	}
+
 	fmt.Printf("Sum: %d\n", sum)
 
 }

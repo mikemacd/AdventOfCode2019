@@ -24,8 +24,8 @@ func main() {
 		panic(err)
 	}
 
-	// Process the input
-	var input []int
+	// Process the program
+	var program []int
 	for i, line := range bytes.Split(data, []byte(",")) {
 		number := strings.TrimSpace(string(line))
 		if number != "" {
@@ -33,11 +33,11 @@ func main() {
 			if err != nil {
 				fmt.Printf("Could not convert line %d (%s) to int\n", i, number)
 			}
-			input = append(input, n)
+			program = append(program, n)
 		}
 	}
 	if debug {
-		fmt.Printf("INPUT: %+v\n", input)
+		fmt.Printf("INPUT: %+v\n", program)
 	}
 
 	for noun := 0; noun <= 99; noun++ {
@@ -53,8 +53,8 @@ func main() {
 					// */
 				}()
 
-				code := make([]int, len(input))
-				copy(code, input)
+				code := make([]int, len(program))
+				copy(code, program)
 				code[1] = noun
 				code[2] = verb
 
