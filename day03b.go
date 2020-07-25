@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-
 	//	"github.com/davecgh/go-spew/spew"
 )
 
@@ -208,7 +207,7 @@ func analyzeWires(board BoardB) int {
 		if owDistance, ok := board[idx{X: tw.X, Y: tw.Y, Wire: otherWire}]; ok {
 			// fmt.Println("-------------------------------------")
 			// spew.Dump(i, distance, ow)
-			found = append(found, position{X: tw.X, Y: tw.Y, Distance: twDistance + owDistance  } )
+			found = append(found, position{X: tw.X, Y: tw.Y, Distance: twDistance + owDistance})
 		}
 
 	}
@@ -225,6 +224,6 @@ func analyzeWires(board BoardB) int {
 	}
 
 	//	spew.Dump(found)
-	
+
 	return minDistance
 }
