@@ -11,7 +11,11 @@ import (
 	"strings"
 )
 
-var debug = false
+type programType struct{ 
+	instructions []int
+	pc int // current program counter / instruction pointer
+}
+var program programType
 
 func main() {
 
@@ -28,90 +32,112 @@ func main() {
 	}
 
 	// take the read file and convert it from strings to ints
-	var program []int
 	for _, num := range bytes.Split([]byte(strings.TrimSpace(string(data))), []byte(",")) {
 		code, err := strconv.Atoi(string(num))
 		if err != nil {
 			log.Fatalf("Could not convert opcode %v to integer. %v\n", num, err)
 		}
-		program = append(program, code)
-	}
 
-	if debug {
-		fmt.Printf("%v \n", program)
+		program.instructions = append(program.instructions, code)
 	}
 
 	// index of current opcode
-	programCounter := 0
+	program.pc = 0
 	opcode := 0
 
 	for opcode != 99 {
-		if debug {
-			fmt.Printf("PC:%+v\t", programCounter)
-		}
-		opcode = program[programCounter]
-
+		instruction := program.instructions[program.pc]
+		modes := instruction / 100
+		opcode = instruction % 100 
+	
 		switch opcode {
 		case 1:
-			{
-				// add
-				operandA := program[program[programCounter+1]]
-				operandB := program[program[programCounter+2]]
-				position := program[programCounter+3]
-				result := operandA + operandB
-				program[position] = result
-
-				if debug {
-					fmt.Printf("%v + %v = %v => %v \t %v \n", operandA, operandB, result, position, program[:30])
-				}
-				programCounter += 4
-			}
+			program.add( modes)
 		case 2:
-			{
-				// multiply
-				operandA := program[program[programCounter+1]]
-				operandB := program[program[programCounter+2]]
-				position := program[programCounter+3]
-				result := operandA * operandB
-				program[position] = result
-
-				if debug {
-					fmt.Printf("%v * %v = %v => %v \t %v \n", operandA, operandB, result, position, program[:30])
-				}
-				programCounter += 4
-			}
+			program.mul( modes)
 		case 3:
-			{
-				reader := bufio.NewReader(os.Stdin)
-				fmt.Print("Enter number: ")
-				text, err := reader.ReadString('\n')
-				if err != nil {
-					log.Fatalf("while reading input: %v", err)
-				}
-
-				input, err := strconv.Atoi(strings.TrimSpace(text))
-				if err != nil {
-					log.Fatalf("Bad number: %v -- %v", text, err)
-				}
-
-				// save
-				operandA := program[programCounter+1]
-				program[operandA] = input
-
-				programCounter += 2
-			}
+			program.input( modes)
 		case 4:
-			{
-				// save
-				operandA := program[programCounter+1]
-				fmt.Printf("output: %d", program[operandA])
-				programCounter += 2
-			}
+			program.output(modes)
 		case 99:
+			// spew.Dump("EXIT:", program)
+
+			os.Exit(0)
 			break
 		default:
 			log.Fatalf("Unexpected opcode: %+v\n", opcode)
 		}
 	}
 
+}
+
+func (p *programType) memGet(position, mode int) (int) {
+	if mode == 0 {
+		return p.instructions[p.instructions[position]]
+	}
+
+	return p.instructions[position]
+}
+
+func (p *programType) memSet(position, value int) {
+	p.instructions[position] = value
+}
+
+func (p *programType) add ( modes int) {
+	modeA:=modes %10
+	modeB:=(modes/10)%10
+
+	operandA := p.memGet(p.pc+1,modeA)
+	operandB := p.memGet(p.pc+2,modeB) 
+	position := p.memGet(p.pc+3,1) // we're just looking up the offset to be used later in memSet thus making the memset be in immediate mode
+
+	result := operandA + operandB
+	
+	p.memSet(position, result)
+
+	p.pc += 4
+	
+}
+
+func (p *programType) mul( modes int) {
+	modeA:=modes %10
+	modeB:=(modes/10)%10
+	//fmt.Printf("modes a:%d b:%d \n",modeA,modeB )
+	
+	operandA := p.memGet(p.pc+1,modeA)
+	operandB := p.memGet(p.pc+2,modeB) 
+	position := p.memGet(p.pc+3,1) // we're just looking up the offset to be used later in memSet thus making the memset be in immediate mode
+	 
+	result := operandA * operandB
+
+	p.memSet(position , result)
+
+	p.pc += 4
+}
+
+func (p *programType) input( modes int) {
+
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter number: ")
+	text, err := reader.ReadString('\n')
+	if err != nil {
+		log.Fatalf("while reading input: %v", err)
+	}
+
+	input, err := strconv.Atoi(strings.TrimSpace(text))
+	if err != nil {
+		log.Fatalf("Bad number: %v -- %v", text, err)
+	}
+ 
+	p.memSet(p.memGet(p.pc+1, 1), input)
+
+	p.pc += 2
+}
+
+func (p *programType) output( modes int) {
+	modeA:=modes % 10
+
+	operandA := p.memGet(p.pc+1,modeA)
+	fmt.Printf("output: %d\n", operandA )
+	p.pc += 2
 }

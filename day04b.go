@@ -13,12 +13,12 @@ type SafeCounter struct {
 }
 
 func main() {
-	var wg sync.WaitGroup
-
 	c := SafeCounter{v: make(map[int]bool)}
 
 	lowerBound := 264360
 	upperBound := 746325
+
+	var wg sync.WaitGroup
 
 	//RULE 2: The value is within the range given in your puzzle input.
 	for i := lowerBound; i <= upperBound; i++ {
