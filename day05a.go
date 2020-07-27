@@ -11,10 +11,11 @@ import (
 	"strings"
 )
 
-type programType struct{ 
+type programType struct {
 	instructions []int
-	pc int // current program counter / instruction pointer
+	pc           int // current program counter / instruction pointer
 }
+
 var program programType
 
 func main() {
@@ -48,15 +49,15 @@ func main() {
 	for opcode != 99 {
 		instruction := program.instructions[program.pc]
 		modes := instruction / 100
-		opcode = instruction % 100 
-	
+		opcode = instruction % 100
+
 		switch opcode {
 		case 1:
-			program.add( modes)
+			program.add(modes)
 		case 2:
-			program.mul( modes)
+			program.mul(modes)
 		case 3:
-			program.input( modes)
+			program.input(modes)
 		case 4:
 			program.output(modes)
 		case 99:
@@ -71,7 +72,7 @@ func main() {
 
 }
 
-func (p *programType) memGet(position, mode int) (int) {
+func (p *programType) memGet(position, mode int) int {
 	if mode == 0 {
 		return p.instructions[p.instructions[position]]
 	}
@@ -83,39 +84,39 @@ func (p *programType) memSet(position, value int) {
 	p.instructions[position] = value
 }
 
-func (p *programType) add ( modes int) {
-	modeA:=modes %10
-	modeB:=(modes/10)%10
+func (p *programType) add(modes int) {
+	modeA := modes % 10
+	modeB := (modes / 10) % 10
 
-	operandA := p.memGet(p.pc+1,modeA)
-	operandB := p.memGet(p.pc+2,modeB) 
-	position := p.memGet(p.pc+3,1) // we're just looking up the offset to be used later in memSet thus making the memset be in immediate mode
+	operandA := p.memGet(p.pc+1, modeA)
+	operandB := p.memGet(p.pc+2, modeB)
+	position := p.memGet(p.pc+3, 1) // we're just looking up the offset to be used later in memSet thus making the memset be in immediate mode
 
 	result := operandA + operandB
-	
+
 	p.memSet(position, result)
 
 	p.pc += 4
-	
+
 }
 
-func (p *programType) mul( modes int) {
-	modeA:=modes %10
-	modeB:=(modes/10)%10
+func (p *programType) mul(modes int) {
+	modeA := modes % 10
+	modeB := (modes / 10) % 10
 	//fmt.Printf("modes a:%d b:%d \n",modeA,modeB )
-	
-	operandA := p.memGet(p.pc+1,modeA)
-	operandB := p.memGet(p.pc+2,modeB) 
-	position := p.memGet(p.pc+3,1) // we're just looking up the offset to be used later in memSet thus making the memset be in immediate mode
-	 
+
+	operandA := p.memGet(p.pc+1, modeA)
+	operandB := p.memGet(p.pc+2, modeB)
+	position := p.memGet(p.pc+3, 1) // we're just looking up the offset to be used later in memSet thus making the memset be in immediate mode
+
 	result := operandA * operandB
 
-	p.memSet(position , result)
+	p.memSet(position, result)
 
 	p.pc += 4
 }
 
-func (p *programType) input( modes int) {
+func (p *programType) input(modes int) {
 
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Enter number: ")
@@ -128,16 +129,16 @@ func (p *programType) input( modes int) {
 	if err != nil {
 		log.Fatalf("Bad number: %v -- %v", text, err)
 	}
- 
+
 	p.memSet(p.memGet(p.pc+1, 1), input)
 
 	p.pc += 2
 }
 
-func (p *programType) output( modes int) {
-	modeA:=modes % 10
+func (p *programType) output(modes int) {
+	modeA := modes % 10
 
-	operandA := p.memGet(p.pc+1,modeA)
-	fmt.Printf("output: %d\n", operandA )
+	operandA := p.memGet(p.pc+1, modeA)
+	fmt.Printf("output: %d\n", operandA)
 	p.pc += 2
 }
