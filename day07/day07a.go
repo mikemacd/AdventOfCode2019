@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -13,7 +12,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 )
 
-type programType struct {
+type programTypeA struct {
 	instructions []int
 	pc           int // current program counter / instruction pointer
 }
@@ -30,8 +29,8 @@ func main() {
 	_ = program
 	//	spew.Dump(permute([]int{0, 1, 2}))
 
-	phaseSeqs:=permute([]int{0,1,2,3,4})
-	_=phaseSeqs
+	phaseSeqs := permute([]int{0, 1, 2, 3, 4})
+	_ = phaseSeqs
 	{
 		biggestSignal := 0
 
@@ -40,32 +39,31 @@ func main() {
 		// 	 {4,3,2,1,0},
 		// 	{0,1,2,3,4,},
 		//  }
-	
-		for _,v := range phaseSeqs {
-	//v := []int{3,1,2,4,0}
-	//v := []int{4,3,2,1,0}
-	//v := []int{0,1,2,3,4,}
-	//v := []int{1,0,4,3,2,}
 
-		signal := 0
-		for _, phaseSequence := range v {
+		for _, v := range phaseSeqs {
+			//v := []int{3,1,2,4,0}
+			//v := []int{4,3,2,1,0}
+			//v := []int{0,1,2,3,4,}
+			//v := []int{1,0,4,3,2,}
+
+			signal := 0
+			for _, phaseSequence := range v {
 				// fmt.Printf("\nPS: %d\n", phaseSequence )
 				// todo: make a copy of program
-				programCopy:=program
-				out := ghostRun(programCopy, []byte(fmt.Sprintf("%d\n%d\n",phaseSequence,signal)))
-				newsignal,err := strconv.Atoi(out)
-				if err!=nil {
+				programCopy := program
+				out := ghostRun(programCopy, []byte(fmt.Sprintf("%d\n%d\n", phaseSequence, signal)))
+				newsignal, err := strconv.Atoi(out)
+				if err != nil {
 					log.Fatalf("signal not understood: %v", err)
 				}
 				// fmt.Printf("\tsignal: %v \n", out)
-				signal=newsignal
+				signal = newsignal
 			}
 			//fmt.Printf("\tsig: %v \n", signal)
-			if signal>biggestSignal{
-				biggestSignal=signal
+			if signal > biggestSignal {
+				biggestSignal = signal
 			}
 		}
-
 
 		// phase, input signal
 		// out := ghostRun(program, []byte("1\n0\n"))
@@ -73,7 +71,7 @@ func main() {
 	}
 }
 
-func (p *programType) memGet(position, mode int) int {
+func (p *programTypeA) memGet(position, mode int) int {
 	if mode == 0 {
 		return p.instructions[p.instructions[position]]
 	}
@@ -81,7 +79,7 @@ func (p *programType) memGet(position, mode int) int {
 	return p.instructions[position]
 }
 
-func (p *programType) memSet(position, value int) {
+func (p *programTypeA) memSet(position, value int) {
 	defer func() {
 		if r := recover(); r != nil {
 
@@ -105,7 +103,7 @@ func (p *programType) memSet(position, value int) {
 	p.instructions[position] = value
 }
 
-func (p *programType) add(modes int) {
+func (p *programTypeA) add(modes int) {
 	if debug {
 		fmt.Println("add")
 	}
@@ -124,7 +122,7 @@ func (p *programType) add(modes int) {
 	p.pc += 4
 }
 
-func (p *programType) mul(modes int) {
+func (p *programTypeA) mul(modes int) {
 	if debug {
 		fmt.Println("mul")
 	}
@@ -143,7 +141,7 @@ func (p *programType) mul(modes int) {
 	p.pc += 4
 }
 
-func (p *programType) input(modes int) {
+func (p *programTypeA) input(modes int, in chan int) {
 	defer func() {
 		p.pc += 2
 	}()
@@ -151,21 +149,12 @@ func (p *programType) input(modes int) {
 		fmt.Println("input")
 	}
 
-	var text string
-	_, err := fmt.Fscanf(os.Stdin, "%s", &text)
-	if err != nil {
-		log.Fatalf("while scaning for input: %v", err)
-	}
-
-	input, err := strconv.Atoi(strings.TrimSpace(text))
-	if err != nil {
-		log.Fatalf("Bad number: %v -- %v", text, err)
-	}
+	input := <-in
 
 	p.memSet(p.memGet(p.pc+1, 1), input)
 }
 
-func (p *programType) output(modes int) {
+func (p *programTypeA) output(modes int, out chan int) {
 	defer func() {
 		p.pc += 2
 	}()
@@ -176,10 +165,10 @@ func (p *programType) output(modes int) {
 
 	operandA := p.memGet(p.pc+1, modeA)
 
-	fmt.Fprintf(os.Stdout, "%d", operandA)
+	out <- operandA
 }
 
-func (p *programType) jumpIfTrue(modes int) {
+func (p *programTypeA) jumpIfTrue(modes int) {
 	if debug {
 		fmt.Println("jumpIfTrue")
 	}
@@ -199,7 +188,7 @@ func (p *programType) jumpIfTrue(modes int) {
 	p.pc += 3
 }
 
-func (p *programType) jumpIfFalse(modes int) {
+func (p *programTypeA) jumpIfFalse(modes int) {
 	if debug {
 		fmt.Println("jumpIfFalse")
 	}
@@ -219,7 +208,7 @@ func (p *programType) jumpIfFalse(modes int) {
 	p.pc += 3
 }
 
-func (p *programType) lessThan(modes int) {
+func (p *programTypeA) lessThan(modes int) {
 	defer func() {
 		p.pc += 4
 	}()
@@ -242,7 +231,7 @@ func (p *programType) lessThan(modes int) {
 	p.memSet(position, 0)
 }
 
-func (p *programType) equalTo(modes int) {
+func (p *programTypeA) equalTo(modes int) {
 	defer func() {
 		p.pc += 4
 	}()
@@ -266,8 +255,8 @@ func (p *programType) equalTo(modes int) {
 
 }
 
-func readProgram(file string) programType {
-	var program programType
+func readProgram(file string) programTypeA {
+	var program programTypeA
 
 	// raw reading of the file
 	data, err := ioutil.ReadFile(file)
@@ -292,7 +281,7 @@ func readProgram(file string) programType {
 	return program
 }
 
-func run(program programType) {
+func run(program programTypeA, in, out chan int) {
 	opcode := 0
 	for opcode != 99 {
 		if debug {
@@ -316,9 +305,9 @@ func run(program programType) {
 		case 2:
 			program.mul(modes)
 		case 3:
-			program.input(modes)
+			program.input(modes, in)
 		case 4:
-			program.output(modes)
+			program.output(modes, out)
 		case 5:
 			program.jumpIfTrue(modes)
 		case 6:
@@ -357,50 +346,4 @@ func permute(set []int) [][]int {
 		}
 	}
 	return permutations
-}
-
-// ghostrun runs the program while providing input from the supplied parameter, and returning any output
-func ghostRun(program programType, input []byte) string {
-	tmpfile, err := ioutil.TempFile("", "example")
-	if err != nil {
-		log.Printf("A\n")
-		log.Fatal(err)
-	}
-
-	defer os.Remove(tmpfile.Name()) // clean up
-
-	if _, err := tmpfile.Write(input); err != nil {
-		log.Printf("B\n")
-		log.Fatal(err)
-	}
-
-	if _, err := tmpfile.Seek(0, 0); err != nil {
-		log.Printf("B\n")
-		log.Fatal(err)
-	}
-
-	oldStdin := os.Stdin
-	defer func() { os.Stdin = oldStdin }() // Restore original Stdin
-	os.Stdin = tmpfile
-
-	oldStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	run(program)
-
-	outC := make(chan string)
-	// copy the output in a separate goroutine so printing can't block indefinitely
-	go func() {
-		var buf bytes.Buffer
-		io.Copy(&buf, r)
-		outC <- buf.String()
-	}()
-
-	// back to normal state
-	w.Close()
-	os.Stdout = oldStdout // restoring the real stdout
-	output := <-outC
-
-	return output
 }
