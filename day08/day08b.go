@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -29,23 +28,9 @@ func main() {
 	image := imageType{width: 25, height: 6, data: make(map[coord]int)}
 	image.read(os.Args[1])
 
-	minZeroLayer := 0
-	minZeroCount := math.MaxInt32
-	for i := 0; i < image.layers; i++ {
-		layerZeroes := image.numDigits(0, i)
-		// fmt.Printf("Layer %d has %d zeros\n", i, layerZeroes )
-		if layerZeroes < minZeroCount {
-			minZeroLayer = i
-			minZeroCount = layerZeroes
-		}
-	}
-
-	ones := image.numDigits(1, minZeroLayer)
-	twos := image.numDigits(2, minZeroLayer)
-	result := ones * twos
-	_ = spew.Sdump(result)
-	fmt.Printf("Layer %d (which had %d zeros) has %d ones and %d twos with a product of %d\n", minZeroLayer, minZeroCount, ones, twos, result)
-
+	_ = spew.Sdump(image.layers)
+	//	fmt.Printf("Layer %d (which had %d zeros) has %d ones and %d twos with a product of %d\n", minZeroLayer, minZeroCount, ones, twos, result)
+	image.render()
 }
 
 func (image *imageType) read(file string) {
@@ -107,6 +92,32 @@ func (image *imageType) print(layer int) {
 	for j := 0; j < image.height; j++ {
 		for i := 0; i < image.width; i++ {
 			fmt.Printf("%v", image.data[coord{layer: layer, x: i, y: j}])
+		}
+		fmt.Printf("\n")
+	}
+	fmt.Printf("\n")
+}
+
+func (image *imageType) render() {
+	for j := 0; j < image.height; j++ {
+		for i := 0; i < image.width; i++ {
+			paint := " "
+
+			for layer := image.layers; layer >= 0; layer-- {
+				// for layer := 0 ; layer< image.layers; layer++ {
+				pos := image.data[coord{layer: layer, x: i, y: j}]
+				if pos != 2 {
+					paint = fmt.Sprintf("%d", pos)
+
+				}
+			}
+			if paint == "0" {
+				fmt.Printf("  ")
+			} else {
+				fmt.Printf("\u2591\u2591")
+			}
+
+			//		fmt.Printf("%v", paint)
 		}
 		fmt.Printf("\n")
 	}
